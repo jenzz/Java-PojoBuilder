@@ -1,4 +1,4 @@
-package com.jenzz.pojobuilder.sample;
+package com.jenzz.pojobuilder.sample.example1;
 
 import com.jenzz.pojobuilder.api.Builder;
 import com.jenzz.pojobuilder.api.Ignore;
@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Builder
-class SamplePojo {
+public class SamplePojo {
 
   // primitives
   byte aByte;

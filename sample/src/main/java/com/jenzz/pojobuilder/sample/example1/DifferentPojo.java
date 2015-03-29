@@ -1,4 +1,4 @@
-package com.jenzz.pojobuilder.sample;
+package com.jenzz.pojobuilder.sample.example1;
 
 import com.jenzz.pojobuilder.api.Builder;
 import java.util.Collection;
@@ -7,14 +7,14 @@ import java.util.Collection;
  * Created by jenzz on 17/03/15.
  */
 @Builder
-class DifferentPojo {
+public class DifferentPojo {
 
   String aString;
   Long aLong;
   StaticNestedPojo staticNestedPojo;
 
   @Builder
-  static class StaticNestedPojo {
+  public static class StaticNestedPojo {
 
     String aString;
     Collection<StaticNestedPojo> aCollection;
