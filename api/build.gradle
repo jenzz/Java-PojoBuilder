@@ -1,4 +1,16 @@
 apply plugin: 'java'
+apply plugin: 'bintray-release'
 
 sourceCompatibility = JavaVersion.VERSION_1_7
 targetCompatibility = JavaVersion.VERSION_1_7
+
+publish {
+  artifactId = 'api'
+  userOrg = rootProject.ext.userOrg
+  groupId = rootProject.ext.groupId
+  uploadName = rootProject.ext.uploadName
+  version = rootProject.ext.version
+  description = rootProject.ext.description
+  website = rootProject.ext.website
+  licences = rootProject.ext.licences
+}

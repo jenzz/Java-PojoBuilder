@@ -5,6 +5,7 @@ buildscript {
   dependencies {
     classpath 'com.android.tools.build:gradle:1.1.3'
     classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
+    classpath 'com.novoda:bintray-release:0.2.7'
   }
 }
 
@@ -12,4 +13,14 @@ allprojects {
   repositories {
     jcenter()
   }
+}
+
+ext {
+  userOrg = 'jenzz'
+  groupId = 'com.jenzz.pojobuilder'
+  uploadName = 'Java-PojoBuilder'
+  version = '1.0'
+  description = 'A Java code generator for the builder pattern using annotation processing'
+  website = 'https://github.com/jenzz/Java-PojoBuilder'
+  licences = ['MIT']
 }
