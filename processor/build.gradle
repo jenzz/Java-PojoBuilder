@@ -1,19 +1,19 @@
 apply plugin: 'java'
-apply plugin: 'bintray-release'
+apply plugin: 'com.novoda.bintray-release'
 
 dependencies {
   compile project(':api')
   compile 'com.google.auto.service:auto-service:1.0-rc2'
-  compile 'com.squareup:javapoet:1.0.0'
+  compile 'com.squareup:javapoet:1.4.0'
 }
 
 publish {
   artifactId = 'processor'
-  userOrg = rootProject.ext.userOrg
-  groupId = rootProject.ext.groupId
-  uploadName = rootProject.ext.uploadName
-  version = rootProject.ext.version
-  description = rootProject.ext.description
-  website = rootProject.ext.website
-  licences = rootProject.ext.licences
+  userOrg = rootProject.userOrg
+  groupId = rootProject.groupId
+  uploadName = rootProject.uploadName
+  publishVersion = rootProject.publishVersion
+  desc = rootProject.desc
+  website = rootProject.website
+  licences = rootProject.licences
 }
