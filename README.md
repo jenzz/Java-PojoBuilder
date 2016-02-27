@@ -1,5 +1,5 @@
-Java - POJO Builder
-============================
+Java - POJO Builder [![Build Status](https://travis-ci.org/jenzz/Java-PojoBuilder.svg?branch=master)](https://travis-ci.org/jenzz/Java-PojoBuilder)
+===================
 * A Java code generator for the builder pattern using annotation processing
 
 Usage
