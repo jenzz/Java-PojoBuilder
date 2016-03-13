@@ -2,7 +2,6 @@ package com.jenzz.pojobuilder.processor;
 
 import com.jenzz.pojobuilder.api.Builder;
 import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
@@ -42,14 +41,18 @@ final class CodeGenerator {
     TypeSpec.Builder builder = classBuilder(className)
         .addModifiers(PUBLIC, FINAL)
         .addMethod(privateConstructor())
-        .addMethod(publicConstructor())
-        .addMethod(fromConstructor());
+        .addMethod(publicConstructor());
+
+    List<Element> optionalFields = builderAnnotatedClass.optionalFields();
+    if (!optionalFields.isEmpty()) {
+      builder.addMethod(fromConstructor());
+    }
 
     for (Element field : builderAnnotatedClass.requiredFields()) {
       builder.addField(field(field, true));
     }
 
-    for (Element field : builderAnnotatedClass.optionalFields()) {
+    for (Element field : optionalFields) {
       builder.addField(field(field, false))
           .addMethod(method(field));
       if (hasBuilderAnnotation(field)) {
@@ -121,11 +124,17 @@ final class CodeGenerator {
     String instanceName = decapitalize(builderAnnotatedClass.simpleName());
     MethodSpec.Builder builder = methodBuilder("build")
         .addModifiers(PUBLIC)
-        .returns(builderAnnotatedClass.className())
-        .addStatement("$T $L = new $T()", builderAnnotatedClass.classElement(),
-            instanceName, builderAnnotatedClass.classElement());
+        .returns(builderAnnotatedClass.className());
 
-    for (Element field : builderAnnotatedClass.optionalFields()) {
+    List<Element> optionalFields = builderAnnotatedClass.optionalFields();
+    if (optionalFields.isEmpty()) {
+      return builder.addStatement("return new $T()", builderAnnotatedClass.classElement()).build();
+    }
+
+    builder.addStatement("$T $L = new $T()", builderAnnotatedClass.classElement(),
+        instanceName, builderAnnotatedClass.classElement());
+
+    for (Element field : optionalFields) {
       String fieldName = field.getSimpleName().toString();
       builder.addStatement("$L.$L = $L", instanceName, fieldName, fieldName);
     }
