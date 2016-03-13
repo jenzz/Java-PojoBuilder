@@ -32,19 +32,18 @@ final class Utils {
   }
 
   static CodeBlock newObjectWithParams(ClassName objectName, List<Element> params) {
-    return newObjectWithParams(objectName, params, null);
+    return newObjectWithParams(objectName, params, "");
   }
 
-  static CodeBlock newObjectWithParams(ClassName objectName, List<Element> params, String prefix) {
+  static CodeBlock newObjectWithParams(ClassName objectName, List<Element> params, String paramsPrefix) {
     CodeBlock.Builder builder = CodeBlock.builder()
         .add("new $T(", objectName);
 
-    prefix = prefix != null ? prefix : "";
     int len = params.size();
     for (int i = 0; i < len; i++) {
       Element field = params.get(i);
       String fieldName = field.getSimpleName().toString();
-      builder.add(prefix + fieldName);
+      builder.add(paramsPrefix + fieldName);
       if (i < len -1) {
         builder.add(", ");
       }

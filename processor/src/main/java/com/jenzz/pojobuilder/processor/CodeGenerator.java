@@ -101,20 +101,20 @@ final class CodeGenerator {
   }
 
   private MethodSpec fromConstructor() {
+    String paramName = "from";
     MethodSpec.Builder builder = methodBuilder(decapitalize(builderAnnotatedClass.simpleName()))
         .addModifiers(PUBLIC, STATIC)
         .returns(generatedClassName)
-        .addParameter(builderAnnotatedClass.className(), "from")
-        .addCode("$T builder = ", generatedClassName)
-        .addCode(newObjectWithParams(generatedClassName, builderAnnotatedClass.requiredFields(), "from."))
-        .addCode(";\n");
+        .addParameter(builderAnnotatedClass.className(), paramName)
+        .addCode("return ")
+        .addCode(newObjectWithParams(generatedClassName, builderAnnotatedClass.requiredFields(), paramName + "."));
 
     for (Element field : builderAnnotatedClass.optionalFields()) {
       String fieldName = field.getSimpleName().toString();
-      builder.addStatement("builder.$L = from.$L", fieldName, fieldName);
+      builder.addCode("\n\t.$L(from.$L)", fieldName, fieldName);
     }
 
-    return builder.addStatement("return builder").build();
+    return builder.addCode(";\n").build();
   }
 
   private MethodSpec build() {
