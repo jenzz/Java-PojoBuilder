@@ -3,12 +3,14 @@ package com.jenzz.pojobuilder.processor;
 import com.google.auto.service.AutoService;
 import com.jenzz.pojobuilder.api.Builder;
 import com.jenzz.pojobuilder.api.Ignore;
+import com.jenzz.pojobuilder.api.Required;
 import com.jenzz.pojobuilder.processor.expections.RuleException;
 import com.jenzz.pojobuilder.processor.expections.UnnamedPackageException;
 import com.jenzz.pojobuilder.processor.rules.NonAbstractClassRule;
 import com.jenzz.pojobuilder.processor.rules.NonPrivateFieldsRule;
 import com.jenzz.pojobuilder.processor.rules.NonPrivateNoArgsConstructorRule;
 import com.jenzz.pojobuilder.processor.rules.Rule;
+import com.jenzz.pojobuilder.processor.rules.SingleAnnotationRule;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
 import java.io.IOException;
@@ -35,7 +37,8 @@ public class BuilderProcessor extends AbstractProcessor {
       new Rule[] {
           new NonAbstractClassRule(),
           new NonPrivateNoArgsConstructorRule(),
-          new NonPrivateFieldsRule()
+          new NonPrivateFieldsRule(),
+          new SingleAnnotationRule()
       };
 
   private final ElementValidator elementValidator = new ElementValidator(RULES);
@@ -51,6 +54,7 @@ public class BuilderProcessor extends AbstractProcessor {
     return new HashSet<String>() {{
       add(Builder.class.getCanonicalName());
       add(Ignore.class.getCanonicalName());
+      add(Required.class.getCanonicalName());
     }};
   }
 

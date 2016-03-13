@@ -1,6 +1,7 @@
 package com.jenzz.pojobuilder.processor;
 
 import com.jenzz.pojobuilder.api.Ignore;
+import com.jenzz.pojobuilder.api.Required;
 import com.squareup.javapoet.ClassName;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,11 +35,23 @@ class BuilderAnnotatedClass {
     return get(classElement);
   }
 
-  List<Element> nonIgnoredFields() {
+  List<Element> requiredFields() {
     List<Element> list = new ArrayList<>();
     for (Element element : fieldsIn(classElement.getEnclosedElements())) {
+      boolean isRequired = element.getAnnotation(Required.class) != null;
+      if (isRequired) {
+        list.add(element);
+      }
+    }
+    return list;
+  }
+
+  List<Element> optionalFields() {
+    List<Element> list = new ArrayList<>();
+    for (Element element : fieldsIn(classElement.getEnclosedElements())) {
+      boolean isRequired = element.getAnnotation(Required.class) != null;
       boolean isIgnored = element.getAnnotation(Ignore.class) != null;
-      if (!isIgnored) {
+      if (!isRequired && !isIgnored) {
         list.add(element);
       }
     }

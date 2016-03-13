@@ -2,14 +2,18 @@ package com.jenzz.pojobuilder.processor;
 
 import com.jenzz.pojobuilder.api.Builder;
 import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
+import java.util.List;
 import javax.lang.model.element.Element;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 
 import static com.jenzz.pojobuilder.processor.Utils.decapitalize;
+import static com.jenzz.pojobuilder.processor.Utils.newObjectWithParams;
+import static com.squareup.javapoet.MethodSpec.constructorBuilder;
 import static com.squareup.javapoet.MethodSpec.methodBuilder;
 import static com.squareup.javapoet.TypeName.get;
 import static com.squareup.javapoet.TypeSpec.classBuilder;
@@ -37,12 +41,17 @@ final class CodeGenerator {
     String className = classNameGenerator.generateBuilderClassString(builderAnnotatedClass);
     TypeSpec.Builder builder = classBuilder(className)
         .addModifiers(PUBLIC, FINAL)
-        .addMethod(constructor())
+        .addMethod(privateConstructor())
+        .addMethod(publicConstructor())
         .addMethod(fromConstructor());
 
-    for (Element field : builderAnnotatedClass.nonIgnoredFields()) {
-      builder.addField(field(field));
-      builder.addMethod(method(field));
+    for (Element field : builderAnnotatedClass.requiredFields()) {
+      builder.addField(field(field, true));
+    }
+
+    for (Element field : builderAnnotatedClass.optionalFields()) {
+      builder.addField(field(field, false))
+          .addMethod(method(field));
       if (hasBuilderAnnotation(field)) {
         builder.addMethod(builderMethod(field));
       }
@@ -61,23 +70,46 @@ final class CodeGenerator {
     return hasBuilderAnnotation;
   }
 
-  private MethodSpec constructor() {
-    return methodBuilder(decapitalize(builderAnnotatedClass.simpleName()))
-        .addModifiers(PUBLIC, STATIC)
-        .returns(generatedClassName)
-        .addStatement("return new $T()", generatedClassName)
+  private MethodSpec privateConstructor() {
+    MethodSpec.Builder builder = constructorBuilder()
+        .addModifiers(PRIVATE);
+
+    for (Element field : builderAnnotatedClass.requiredFields()) {
+      String fieldName = field.getSimpleName().toString();
+      builder.addParameter(get(field.asType()), fieldName)
+          .addStatement("this.$L = $L", fieldName, fieldName);
+    }
+
+    return builder.build();
+  }
+
+  private MethodSpec publicConstructor() {
+    MethodSpec.Builder builder = methodBuilder(decapitalize(builderAnnotatedClass.simpleName()))
+            .addModifiers(PUBLIC, STATIC)
+            .returns(generatedClassName);
+
+    List<Element> requiredFields = builderAnnotatedClass.requiredFields();
+    for(Element field : requiredFields) {
+      String fieldName = field.getSimpleName().toString();
+      builder.addParameter(get(field.asType()), fieldName);
+    }
+
+    return builder.addCode("return ")
+        .addCode(newObjectWithParams(generatedClassName, requiredFields))
+        .addCode(";\n")
         .build();
   }
 
   private MethodSpec fromConstructor() {
-    MethodSpec.Builder builder =
-        methodBuilder(decapitalize(builderAnnotatedClass.simpleName()))
-            .addModifiers(PUBLIC, STATIC)
-            .returns(generatedClassName)
-            .addParameter(builderAnnotatedClass.className(), "from")
-            .addStatement("$T builder = new $T()", generatedClassName, generatedClassName);
+    MethodSpec.Builder builder = methodBuilder(decapitalize(builderAnnotatedClass.simpleName()))
+        .addModifiers(PUBLIC, STATIC)
+        .returns(generatedClassName)
+        .addParameter(builderAnnotatedClass.className(), "from")
+        .addCode("$T builder = ", generatedClassName)
+        .addCode(newObjectWithParams(generatedClassName, builderAnnotatedClass.requiredFields(), "from."))
+        .addCode(";\n");
 
-    for (Element field : builderAnnotatedClass.nonIgnoredFields()) {
+    for (Element field : builderAnnotatedClass.optionalFields()) {
       String fieldName = field.getSimpleName().toString();
       builder.addStatement("builder.$L = from.$L", fieldName, fieldName);
     }
@@ -93,7 +125,7 @@ final class CodeGenerator {
         .addStatement("$T $L = new $T()", builderAnnotatedClass.classElement(),
             instanceName, builderAnnotatedClass.classElement());
 
-    for (Element field : builderAnnotatedClass.nonIgnoredFields()) {
+    for (Element field : builderAnnotatedClass.optionalFields()) {
       String fieldName = field.getSimpleName().toString();
       builder.addStatement("$L.$L = $L", instanceName, fieldName, fieldName);
     }
@@ -101,10 +133,15 @@ final class CodeGenerator {
     return builder.addStatement("return $L", instanceName).build();
   }
 
-  private FieldSpec field(Element field) {
-    return FieldSpec.builder(get(field.asType()), field.getSimpleName().toString())
-        .addModifiers(PRIVATE)
-        .build();
+  private FieldSpec field(Element field, boolean isFinal) {
+    FieldSpec.Builder builder = FieldSpec.builder(get(field.asType()), field.getSimpleName().toString())
+        .addModifiers(PRIVATE);
+
+    if (isFinal) {
+      builder.addModifiers(FINAL);
+    }
+
+    return builder.build();
   }
 
   private MethodSpec method(Element field) {

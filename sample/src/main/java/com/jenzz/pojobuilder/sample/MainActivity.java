@@ -14,9 +14,8 @@ public class MainActivity extends Activity {
 
   static {
     // example 1
-    samplePojo()
+    samplePojo(10, 10L)
         .aString("aString")
-        .aInt(10)
         .aSet(Collections.<Integer>emptySet())
         .differentPojo(
             differentPojo()

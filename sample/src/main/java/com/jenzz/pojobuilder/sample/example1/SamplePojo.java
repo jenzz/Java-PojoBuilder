@@ -2,6 +2,7 @@ package com.jenzz.pojobuilder.sample.example1;
 
 import com.jenzz.pojobuilder.api.Builder;
 import com.jenzz.pojobuilder.api.Ignore;
+import com.jenzz.pojobuilder.api.Required;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,8 +13,8 @@ public class SamplePojo {
   // primitives
   byte aByte;
   short aShort;
-  int aInt;
-  long aLong;
+  @Required int aInt;
+  @Required long aLong;
   float aFloat;
   double aDouble;
   boolean aBoolean;
