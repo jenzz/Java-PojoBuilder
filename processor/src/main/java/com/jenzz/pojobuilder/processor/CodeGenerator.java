@@ -1,6 +1,7 @@
 package com.jenzz.pojobuilder.processor;
 
 import com.jenzz.pojobuilder.api.Builder;
+import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
@@ -39,6 +40,9 @@ final class CodeGenerator {
   TypeSpec brewJava() {
     String className = classNameGenerator.generateBuilderClassString(builderAnnotatedClass);
     TypeSpec.Builder builder = classBuilder(className)
+        .addAnnotation(AnnotationSpec.builder(SuppressWarnings.class)
+            .addMember("value", "$S", "unused")
+            .build())
         .addModifiers(PUBLIC, FINAL)
         .addMethod(privateConstructor())
         .addMethod(publicConstructor());
