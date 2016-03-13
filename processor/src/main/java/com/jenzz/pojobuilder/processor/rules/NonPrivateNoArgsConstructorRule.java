@@ -13,15 +13,12 @@ public class NonPrivateNoArgsConstructorRule implements Rule {
 
   @Override
   public void validate(Element element) throws RuleException {
-    for (ExecutableElement constructor : constructorsIn(element.getEnclosedElements()))
-      if (constructor.getParameters().isEmpty() && !constructor.getModifiers().contains(PRIVATE))
+    for (ExecutableElement constructor : constructorsIn(element.getEnclosedElements())) {
+      if (constructor.getParameters().isEmpty() && !constructor.getModifiers().contains(PRIVATE)) {
         return;
-    throw exception();
-  }
-
-  @Override
-  public RuleException exception() {
-    return new MissingNoArgsConstructorException(
-        "Class annotated with " + ANNOTATION + " must have a non-private no args constructor.");
+      }
+    }
+    throw new MissingNoArgsConstructorException("Class annotated with " + ANNOTATION +
+        " must have a non-private no args constructor.");
   }
 }

@@ -6,6 +6,4 @@ import javax.lang.model.element.Element;
 public interface Rule {
 
   void validate(Element element) throws RuleException;
-
-  RuleException exception();
 }

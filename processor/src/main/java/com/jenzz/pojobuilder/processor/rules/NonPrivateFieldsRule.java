@@ -12,24 +12,16 @@ import static javax.lang.model.util.ElementFilter.fieldsIn;
 
 public class NonPrivateFieldsRule implements Rule {
 
-  private VariableElement field;
-
   @Override
   public void validate(Element element) throws RuleException {
     for (VariableElement field : fieldsIn(element.getEnclosedElements())) {
       boolean isPrivate = field.getModifiers().contains(PRIVATE);
       boolean isIgnored = field.getAnnotation(Ignore.class) != null;
       if (isPrivate && !isIgnored) {
-        this.field = field;
-        throw exception();
+        throw new PrivateFieldException("Class annotated with " + ANNOTATION +
+            " has private field " + field.getSimpleName() + "." +
+            " Add @Ignore annotation or make field at least package-private.");
       }
     }
-  }
-
-  @Override
-  public RuleException exception() {
-    return new PrivateFieldException(
-        "Class annotated with " + ANNOTATION + " has private field " + field.getSimpleName() + ". "
-            + "Add @Ignore annotation or make field at least package-private.");
   }
 }

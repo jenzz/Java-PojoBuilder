@@ -11,12 +11,8 @@ public class NonAbstractClassRule implements Rule {
 
   @Override
   public void validate(Element element) throws RuleException {
-    if (element.getModifiers().contains(ABSTRACT)) throw exception();
-  }
-
-  @Override
-  public RuleException exception() {
-    return new AbstractClassException(
-        "Classes annotated with " + ANNOTATION + " must not be abstract.");
+    if (element.getModifiers().contains(ABSTRACT)) {
+      throw new AbstractClassException("Classes annotated with " + ANNOTATION + " must not be abstract.");
+    }
   }
 }

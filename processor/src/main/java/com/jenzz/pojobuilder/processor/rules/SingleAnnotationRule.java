@@ -11,22 +11,15 @@ import static javax.lang.model.util.ElementFilter.fieldsIn;
 
 public class SingleAnnotationRule implements Rule {
 
-  private VariableElement field;
-
   @Override
   public void validate(Element element) throws RuleException {
     for (VariableElement field : fieldsIn(element.getEnclosedElements())) {
       boolean isRequired = field.getAnnotation(Required.class) != null;
       boolean isIgnored = field.getAnnotation(Ignore.class) != null;
       if (isRequired && isIgnored) {
-        this.field = field;
-        throw exception();
+        throw new MultipleAnnotationsException("Field " + field.getSimpleName() +
+            " cannot be required and ignored at the same time.");
       }
     }
-  }
-
-  @Override
-  public RuleException exception() {
-    return new MultipleAnnotationsException("Field " + field.getSimpleName() + " cannot be required and ignored at the same time.");
   }
 }
